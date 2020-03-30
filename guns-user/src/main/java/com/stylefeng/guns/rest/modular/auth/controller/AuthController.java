@@ -1,7 +1,5 @@
 package com.stylefeng.guns.rest.modular.auth.controller;
 
-import com.alibaba.dubbo.config.annotation.Reference;
-import com.luo.user.UserAPI;
 import com.stylefeng.guns.core.exception.GunsException;
 import com.stylefeng.guns.rest.common.exception.BizExceptionEnum;
 import com.stylefeng.guns.rest.modular.auth.controller.dto.AuthRequest;
@@ -23,8 +21,7 @@ import javax.annotation.Resource;
  */
 @RestController
 public class AuthController {
-    @Reference(interfaceClass = UserAPI.class)
-    private UserAPI userAPI;
+
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
@@ -33,7 +30,7 @@ public class AuthController {
 
     @RequestMapping(value = "${jwt.auth-path}")
     public ResponseEntity<?> createAuthenticationToken(AuthRequest authRequest) {
-        userAPI.login(authRequest.getCredenceName(),authRequest.getPassword());
+
         boolean validate = reqValidator.validate(authRequest);
 
         if (validate) {
