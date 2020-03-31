@@ -6,6 +6,7 @@ import com.stylefeng.guns.rest.common.exception.BizExceptionEnum;
 import com.stylefeng.guns.rest.config.properties.JwtProperties;
 import com.stylefeng.guns.rest.modular.auth.util.JwtTokenUtil;
 import io.jsonwebtoken.JwtException;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,17 @@ public class AuthFilter extends OncePerRequestFilter {
         if (request.getServletPath().equals("/" + jwtProperties.getAuthPath())) {
             chain.doFilter(request, response);
             return;
+        }
+        //配置忽略列表
+        String ignoreUrl = jwtProperties.getIgnoreUrl();
+        if(StringUtils.isNotEmpty(ignoreUrl)) {
+            String[] ignoreUrls = ignoreUrl.split(",");
+            for(int i =0;i<ignoreUrls.length;i++){
+                if (request.getServletPath().equals(ignoreUrls[i]) ){
+                    chain.doFilter(request, response);
+                    return;
+                }
+            }
         }
         final String requestHeader = request.getHeader(jwtProperties.getHeader());
         String authToken = null;

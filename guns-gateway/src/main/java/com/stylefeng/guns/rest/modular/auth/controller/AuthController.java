@@ -28,17 +28,21 @@ public class AuthController {
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
-    @Resource(name = "simpleValidator")
-    private IReqValidator reqValidator;
+//    @Resource(name = "simpleValidator")
+//    private IReqValidator reqValidator;
 
     @RequestMapping(value = "${jwt.auth-path}")
     public ResponseEntity<?> createAuthenticationToken(AuthRequest authRequest) {
         userAPI.login(authRequest.getCredenceName(),authRequest.getPassword());
-        boolean validate = reqValidator.validate(authRequest);
-
+//        boolean validate = reqValidator.validate(authRequest);
+        boolean validate = true;
+        int userId = userAPI.login(authRequest.getUserName(),authRequest.getPassword());
+        if(userId == 0){
+            validate = false;
+        }
         if (validate) {
             final String randomKey = jwtTokenUtil.getRandomKey();
-            final String token = jwtTokenUtil.generateToken(authRequest.getUserName(), randomKey);
+            final String token = jwtTokenUtil.generateToken(userId+"", randomKey);
             return ResponseEntity.ok(new AuthResponse(token, randomKey));
         } else {
             throw new GunsException(BizExceptionEnum.AUTH_REQUEST_ERROR);
